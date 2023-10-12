@@ -23,7 +23,7 @@ public abstract class BaseController<T extends BaseUnit> {
     }
 
     public T update(T data) {
-        if(storage.containsKey(data.getId())) {
+        if (storage.containsKey(data.getId())) {
             storage.put(data.getId(), data);
         } else {
             throw new ValidationException(String.format("%s не найден", data));
