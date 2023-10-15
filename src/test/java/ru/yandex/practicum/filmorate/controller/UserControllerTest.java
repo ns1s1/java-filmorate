@@ -9,12 +9,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.util.ResourceUtils;
 import org.springframework.web.util.NestedServletException;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,18 +31,18 @@ public class UserControllerTest {
         mockMvc.perform(
                         MockMvcRequestBuilders.post(PATH)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(getContent("controller/request/user/user.json")))
+                                .content(TestHelper.getContent("controller/request/user/user.json")))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    void shouldCreateUserFailBirthday() throws Exception {
+    void ShouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidBirthday() throws Exception {
         NestedServletException exception = assertThrows(
                 NestedServletException.class,
                 () -> mockMvc.perform(
                                 MockMvcRequestBuilders.post(PATH)
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(getContent("controller/request/user/userFailBirthday.json")))
+                                        .content(TestHelper.getContent("controller/request/user/userFailBirthday.json")))
                         .andExpect(MockMvcResultMatchers.status().is5xxServerError()));
 
         assertEquals("birthday - must be a date in the past or in the present", Objects.requireNonNull(
@@ -54,13 +50,13 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldCreateUserFailEmail() throws Exception {
+    void ShouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidEmail() throws Exception {
         NestedServletException exception = assertThrows(
                 NestedServletException.class,
                 () -> mockMvc.perform(
                                 MockMvcRequestBuilders.post(PATH)
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(getContent("controller/request/user/userFailEmail.json")))
+                                        .content(TestHelper.getContent("controller/request/user/userFailEmail.json")))
                         .andExpect(MockMvcResultMatchers.status().is5xxServerError()));
 
         assertEquals("email - must be a well-formed email address", Objects.requireNonNull(
@@ -68,25 +64,16 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldCreateUserFailLogin() throws Exception {
+    void ShouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidLogin() throws Exception {
         NestedServletException exception = assertThrows(
                 NestedServletException.class,
                 () -> mockMvc.perform(
                                 MockMvcRequestBuilders.post(PATH)
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(getContent("controller/request/user/userFailLogin.json")))
+                                        .content(TestHelper.getContent("controller/request/user/userFailLogin.json")))
                         .andExpect(MockMvcResultMatchers.status().is5xxServerError()));
 
         assertEquals("birthday - must be a date in the past or in the present", Objects.requireNonNull(
                 exception.getMessage().substring(108)));
-    }
-
-    private String getContent(String file) {
-        try {
-            return Files.readString(ResourceUtils.getFile("classpath:" + file).toPath(),
-                    StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            return "";
-        }
     }
 }

@@ -7,32 +7,44 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.util.Validate;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping("/films")
-public class FilmController extends BaseController<Film> {
+public class FilmController {
+
+    private final Map<Long, Film> filmsStorage = new HashMap<>();
+    private long generatedId;
 
     @PostMapping
     public Film create(@RequestBody @Valid Film film, BindingResult bindingResult) {
         Validate.validate(bindingResult);
-        Film createFilm = super.create(film);
-        log.info("Новый фильм добавлен {}", createFilm);
-        return createFilm;
+        film.setId(++generatedId);
+        filmsStorage.put(film.getId(), film);
+        log.info("Новый фильм добавлен {}", film);
+        return film;
     }
 
     @PutMapping
     public Film update(@RequestBody @Valid Film film, BindingResult bindingResult) {
         Validate.validate(bindingResult);
-        Film updatedFilm = super.update(film);
-        log.info("Данные фильма изменены {}", updatedFilm);
+        if (filmsStorage.containsKey(film.getId())) {
+            filmsStorage.put(film.getId(), film);
+            log.info("Данные фильма изменены {}", film);
+        } else {
+            throw new ValidationException("Фильм не найден");
+        }
 
-        return updatedFilm;
+        return film;
     }
 
     @GetMapping
     public List<Film> findAll() {
-        return super.findAll();
+        return new ArrayList<>(filmsStorage.values());
     }
 }
