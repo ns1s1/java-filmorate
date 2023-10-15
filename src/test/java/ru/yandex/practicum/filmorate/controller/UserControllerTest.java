@@ -36,7 +36,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void ShouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidBirthday() throws Exception {
+    void shouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidBirthday() throws Exception {
         NestedServletException exception = assertThrows(
                 NestedServletException.class,
                 () -> mockMvc.perform(
@@ -50,7 +50,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void ShouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidEmail() throws Exception {
+    void shouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidEmail() throws Exception {
         NestedServletException exception = assertThrows(
                 NestedServletException.class,
                 () -> mockMvc.perform(
@@ -64,7 +64,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void ShouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidLogin() throws Exception {
+    void shouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidLogin() throws Exception {
         NestedServletException exception = assertThrows(
                 NestedServletException.class,
                 () -> mockMvc.perform(

@@ -37,7 +37,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void ShouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidName() throws Exception {
+    void shouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidName() throws Exception {
         NestedServletException exception = assertThrows(
                 NestedServletException.class,
                 () -> mockMvc.perform(
@@ -51,7 +51,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void ShouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidDescription() throws Exception {
+    void shouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidDescription() throws Exception {
         NestedServletException exception = assertThrows(
                 NestedServletException.class,
                 () -> mockMvc.perform(
@@ -65,7 +65,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void ShouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidDuration() throws Exception {
+    void shouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidDuration() throws Exception {
         NestedServletException exception = assertThrows(
                 NestedServletException.class,
                 () -> mockMvc.perform(
@@ -79,7 +79,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void ShouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidReleaseDate() throws Exception {
+    void shouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidReleaseDate() throws Exception {
         final NestedServletException exception = assertThrows(
                 NestedServletException.class,
                 () -> mockMvc.perform(
