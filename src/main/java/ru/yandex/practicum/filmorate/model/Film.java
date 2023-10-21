@@ -10,6 +10,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -28,4 +30,8 @@ public class Film extends BaseUnit {
 
     @Min(1)
     private int duration;
+
+    private int rate;
+
+    private Set<Long> likes = new HashSet<>();
 }
