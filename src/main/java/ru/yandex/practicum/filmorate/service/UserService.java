@@ -49,7 +49,7 @@ public class UserService {
     public List<User> getAllFriends(long id) {
         User user = userStorage.getUserById(id);
         List<User> friends = new ArrayList<>();
-        for(long friendId : user.getFriends()) {
+        for (long friendId : user.getFriends()) {
             friends.add(userStorage.getUserById(friendId));
         }
         return friends;
