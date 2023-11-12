@@ -9,12 +9,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.util.NestedServletException;
-
-import java.util.Objects;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -37,43 +31,28 @@ public class UserControllerTest {
 
     @Test
     void shouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidBirthday() throws Exception {
-        NestedServletException exception = assertThrows(
-                NestedServletException.class,
-                () -> mockMvc.perform(
-                                MockMvcRequestBuilders.post(PATH)
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(TestHelper.getContent("controller/request/user/userFailBirthday.json")))
-                        .andExpect(MockMvcResultMatchers.status().is5xxServerError()));
-
-        assertEquals("birthday - must be a date in the past or in the present", Objects.requireNonNull(
-                exception.getMessage().substring(108)));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(TestHelper.getContent("controller/request/user/userFailBirthday.json")))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
     void shouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidEmail() throws Exception {
-        NestedServletException exception = assertThrows(
-                NestedServletException.class,
-                () -> mockMvc.perform(
-                                MockMvcRequestBuilders.post(PATH)
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(TestHelper.getContent("controller/request/user/userFailEmail.json")))
-                        .andExpect(MockMvcResultMatchers.status().is5xxServerError()));
-
-        assertEquals("email - must be a well-formed email address", Objects.requireNonNull(
-                exception.getMessage().substring(108)));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(TestHelper.getContent("controller/request/user/userFailEmail.json")))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
     void shouldThrowAnExceptionWhenCreatingAMovieWithAnInvalidLogin() throws Exception {
-        NestedServletException exception = assertThrows(
-                NestedServletException.class,
-                () -> mockMvc.perform(
-                                MockMvcRequestBuilders.post(PATH)
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(TestHelper.getContent("controller/request/user/userFailLogin.json")))
-                        .andExpect(MockMvcResultMatchers.status().is5xxServerError()));
-
-        assertEquals("birthday - must be a date in the past or in the present", Objects.requireNonNull(
-                exception.getMessage().substring(108)));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post(PATH)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(TestHelper.getContent("controller/request/user/userFailLogin.json")))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 }
