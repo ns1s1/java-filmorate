@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +36,7 @@ public class FilmDbStorageTest {
     Genre genre1 = Genre.builder().id(1L).name("Комедия").build();
 
     Film film = Film.builder()
-            .id(1l)
+            .id(1L)
             .name("Опенгеймер")
             .description("История жизни американского физика-теоретика Роберта Оппенгеймера, " +
                     "который во времена Второй мировой войны руководил Манхэттенским проектом — " +
@@ -105,7 +104,7 @@ public class FilmDbStorageTest {
     public void shouldGetFilmById() {
         filmStorage.create(film);
 
-        Film savedFilm = filmStorage.getFilmById(1l).get();
+        Film savedFilm = filmStorage.getFilmById(1L).get();
 
         assertThat(savedFilm)
                 .isNotNull()
