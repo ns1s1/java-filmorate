@@ -51,7 +51,7 @@ class UserDbStorageTest {
         UserDbStorage userStorage = new UserDbStorage(jdbcTemplate);
         userStorage.create(newUser);
 
-        User savedUser = userStorage.findById(1l).get();
+        User savedUser = userStorage.findById(1L).get();
 
         assertThat(savedUser)
                 .isNotNull()
