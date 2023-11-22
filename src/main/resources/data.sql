@@ -1,4 +1,4 @@
-INSERT INTO genre (genre_id, name)
+MERGE INTO genre (genre_id, name)
 VALUES (1, 'Комедия'),
        (2, 'Драма'),
        (3, 'Мультфильм'),
@@ -6,7 +6,7 @@ VALUES (1, 'Комедия'),
        (5, 'Документальный'),
        (6, 'Боевик');
 
-INSERT INTO mpa (mpa_id, name, description)
+MERGE INTO mpa (mpa_id, name, description)
 VALUES (1, 'G', 'нет возрастных ограничений'),
        (2, 'PG', 'детям рекомендуется смотреть фильм с родителями'),
        (3, 'PG-13', 'детям до 13 лет просмотр не желателен'),
