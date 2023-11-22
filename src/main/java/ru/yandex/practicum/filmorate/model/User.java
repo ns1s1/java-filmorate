@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,18 +18,20 @@ import java.util.Set;
 @NoArgsConstructor
 public class User extends BaseUnit {
 
-    @NotEmpty
+    @NotBlank
     @Email
     private String email;
 
     @NotBlank
+    @Pattern(regexp = "^\\S+$")
     private String login;
-
 
     private String name;
 
     @PastOrPresent
     private LocalDate birthday;
 
-    private Set<Long> friends = new HashSet<>();
+    @Builder.Default
+    @JsonIgnore
+    private Set<Friendship> friendships = new HashSet<>();
 }

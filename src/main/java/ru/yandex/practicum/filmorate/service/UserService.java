@@ -1,72 +1,125 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
-
-    public List<User> findAll() {
-        return userStorage.findAll();
-    }
+    private Long id = 0L;
 
     public User create(User user) {
-        return userStorage.create(user);
+        validate(user);
+        generateId();
+        user.setId(id);
+        ensureName(user);
+        userStorage.create(user);
+        log.info("Добавлен пользователь {}", user);
+        return user;
     }
 
     public User update(User user) {
-        return userStorage.update(user);
+        Long id = user.getId();
+        User savedUser = checkUserIsExists(id);
+
+        validate(user);
+        ensureName(user);
+        BeanUtils.copyProperties(user, savedUser, "friendships");
+        userStorage.update(savedUser);
+        log.info("Обновлен пользователь {}", savedUser);
+        return savedUser;
     }
 
-    public User getUserById(Long id) {
-        return userStorage.getUserById(id);
+    public List<User> getAll() {
+        return userStorage.findAll();
     }
 
-    public void addFriends(long userId, long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
+    public User getById(Long userId) {
+        return checkUserIsExists(userId);
     }
 
-    public void removeFriends(long userId, long friendId) {
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
-    }
+    public List<User> getFriendsByUserId(Long userId) {
+        User user = checkUserIsExists(userId);
 
-    public List<User> getAllFriends(long id) {
-        User user = userStorage.getUserById(id);
-
-        return user.getFriends().stream()
-                .map(userStorage::getUserById)
+        return user.getFriendships()
+                .stream()
+                .map(Friendship::getFriendId)
+                .map(userStorage::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
     }
 
-    public List<User> getCommonFriends(long id, long otherId) {
-        Set<Long> users = userStorage.getUserById(id).getFriends();
-        Set<Long> otherUsers = userStorage.getUserById(otherId).getFriends();
+    public void addFriend(Long userId, Long friendId) {
+        User user = checkUserIsExists(userId);
+        checkUserIsExists(friendId);
 
-        Set<Long> commonFriendsId = users.stream()
-                .filter(otherUsers::contains)
-                .collect(Collectors.toSet());
+        user.getFriendships().add(Friendship.builder().friendId(friendId).build());
+        userStorage.update(user);
+    }
 
-        List<User> commonFriendsIds = new ArrayList<>();
-        for (Long userId : commonFriendsId) {
-            commonFriendsIds.add(userStorage.getUserById(userId));
+    public void removeFriend(Long userId, Long friendId) {
+        User user = checkUserIsExists(userId);
+        checkUserIsExists(friendId);
+
+        user.getFriendships().remove(Friendship.builder().friendId(friendId).build());
+        userStorage.update(user);
+    }
+
+    public List<User> getCommonFriends(Long firstUserId, Long secondUserId) {
+        User firstUser = checkUserIsExists(firstUserId);
+
+        User secondUser = checkUserIsExists(secondUserId);
+
+        Set<Long> commonIds = firstUser.getFriendships().stream()
+                .map(Friendship::getFriendId).collect(Collectors.toSet());
+        commonIds.retainAll(secondUser.getFriendships().stream()
+                .map(Friendship::getFriendId)
+                .collect(Collectors.toSet()));
+        return commonIds.stream()
+                .map(userStorage::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    private void ensureName(User user) {
+        String name = user.getName();
+        if (name == null || name.isBlank()) {
+            user.setName(user.getLogin());
         }
+    }
 
-        return commonFriendsIds;
+    private void validate(User user) {
+        // Validate email
+        Optional<User> foundUser = userStorage.findByEmail(user.getEmail());
+
+        if (foundUser.isPresent() && !Objects.equals(foundUser.get().getId(), user.getId())) {
+            throw new NotFoundException("Пользователь уже существует");
+        }
+    }
+
+    private Long generateId() {
+        return ++id;
+    }
+
+    private User checkUserIsExists(Long id) {
+        User user = userStorage.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return user;
     }
 }
