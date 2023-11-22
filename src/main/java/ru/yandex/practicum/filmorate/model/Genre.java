@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Genre extends BaseUnit implements Comparable<Genre> {
 
-    String name;
+    private String name;
 
     @Override
     public int compareTo(Genre genre) {

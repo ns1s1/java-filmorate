@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import com.fasterxml.jackson.core.PrettyPrinter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -34,8 +35,7 @@ public class UserService {
 
     public User update(User user) {
         Long id = user.getId();
-        User savedUser = userStorage.findById(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User savedUser = checkUserIsExists(id);
 
         validate(user);
         ensureName(user);
@@ -50,13 +50,11 @@ public class UserService {
     }
 
     public User getById(Long userId) {
-        return userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return checkUserIsExists(userId);
     }
 
     public List<User> getFriendsByUserId(Long userId) {
-        User user = userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User user = checkUserIsExists(userId);
 
         return user.getFriendships()
                 .stream()
@@ -68,33 +66,25 @@ public class UserService {
     }
 
     public void addFriend(Long userId, Long friendId) {
-        User user = userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-
-        userStorage.findById(friendId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User user = checkUserIsExists(userId);
+        checkUserIsExists(friendId);
 
         user.getFriendships().add(Friendship.builder().friendId(friendId).build());
         userStorage.update(user);
     }
 
     public void removeFriend(Long userId, Long friendId) {
-        User user = userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-
-        userStorage.findById(friendId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User user = checkUserIsExists(userId);
+        checkUserIsExists(friendId);
 
         user.getFriendships().remove(Friendship.builder().friendId(friendId).build());
         userStorage.update(user);
     }
 
     public List<User> getCommonFriends(Long firstUserId, Long secondUserId) {
-        User firstUser = userStorage.findById(firstUserId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User firstUser = checkUserIsExists(firstUserId);
 
-        User secondUser = userStorage.findById(secondUserId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User secondUser = checkUserIsExists(secondUserId);
 
         Set<Long> commonIds = firstUser.getFriendships().stream()
                 .map(Friendship::getFriendId).collect(Collectors.toSet());
@@ -126,5 +116,11 @@ public class UserService {
 
     private Long generateId() {
         return ++id;
+    }
+
+    private User checkUserIsExists(Long id) {
+        User user = userStorage.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return user;
     }
 }

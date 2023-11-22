@@ -33,5 +33,5 @@ public class User extends BaseUnit {
 
     @Builder.Default
     @JsonIgnore
-    Set<Friendship> friendships = new HashSet<>();
+    private Set<Friendship> friendships = new HashSet<>();
 }

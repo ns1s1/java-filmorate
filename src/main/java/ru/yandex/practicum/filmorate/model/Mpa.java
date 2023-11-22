@@ -11,6 +11,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class Mpa extends BaseUnit {
 
-    String name;
-    String description;
+    private String name;
+    private String description;
 }

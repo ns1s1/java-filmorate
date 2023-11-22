@@ -5,11 +5,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.model.BaseUnit;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final MpaDbStorage mpaDbStorage;
+    private final MpaStorage mpaStorage;
     private final GenreStorage genreDbStorage;
 
     @Transactional
@@ -39,7 +40,7 @@ public class FilmDbStorage implements FilmStorage {
                 film.getReleaseDate(),
                 film.getDuration());
 
-        addGenre(film, film.getGenres());
+        addGenres(film, film.getGenres().stream().map(BaseUnit::getId).collect(Collectors.toList()));
     }
 
     @Transactional
@@ -115,7 +116,7 @@ public class FilmDbStorage implements FilmStorage {
         String name = rs.getString("name");
         String description = rs.getString("description");
         Long mpaId = rs.getLong("mpa_id");
-        Mpa mpa = mpaDbStorage.getMpaById(mpaId).orElse(null);
+        Mpa mpa = mpaStorage.getMpaById(mpaId).orElse(null);
         LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
         Integer duration = rs.getInt("duration");
 
@@ -133,19 +134,24 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    private void addGenre(Film film, Set<Genre> genres) {
-        String query = "insert into film_genre (film_id, genre_id) values (?, ?)";
-        genres.forEach(genre -> jdbcTemplate.update(query, film.getId(), genre.getId()));
-    }
-
     private void addGenres(Film film, List<Long> genreIds) {
         String query = "insert into film_genre (film_id, genre_id) values (?, ?)";
-        genreIds.forEach(genreId -> jdbcTemplate.update(query, film.getId(), genreId));
+        List<Object[]> list = new ArrayList<>();
+
+        for (Long genre : genreIds) {
+            list.add(new Object[]{film.getId(), genre});
+        }
+        jdbcTemplate.batchUpdate(query, list);
     }
 
     private void removeGenres(Film film, List<Long> genreIds) {
         String query = "delete from film_genre where film_id = ? and genre_id = ?";
-        genreIds.forEach(genreId -> jdbcTemplate.update(query, film.getId(), genreId));
+        List<Object[]> list = new ArrayList<>();
+
+        for (Long genre : genreIds) {
+            list.add(new Object[]{film.getId(), genre});
+        }
+        jdbcTemplate.batchUpdate(query, list);
     }
 
     private List<Long> findGenresIdsByFilmId(Long filmId) {
@@ -170,11 +176,21 @@ public class FilmDbStorage implements FilmStorage {
 
     private void addLikes(Film film, List<Long> userIds) {
         String query = "insert into film_like (film_id, user_id) values (?, ?)";
-        userIds.forEach(userId -> jdbcTemplate.update(query, film.getId(), userId));
+        List<Object[]> list = new ArrayList<>();
+
+        for (Long id : userIds) {
+            list.add(new Object[]{film.getId(), id});
+        }
+        jdbcTemplate.batchUpdate(query, list);
     }
 
     private void removeLikes(Film film, List<Long> userIds) {
         String query = "delete from film_like where film_id = ? and user_id = ?";
-        userIds.forEach(userId -> jdbcTemplate.update(query, film.getId(), userId));
+        List<Object[]> list = new ArrayList<>();
+
+        for (Long id : userIds) {
+            list.add(new Object[]{film.getId(), id});
+        }
+        jdbcTemplate.batchUpdate(query, list);
     }
 }

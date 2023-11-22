@@ -35,10 +35,10 @@ public class Film extends BaseUnit {
     private int duration;
 
     @NotNull
-    Mpa mpa;
+    private Mpa mpa;
 
     @JsonIgnore
     private Set<Long> likes = new HashSet<>();
 
-    Set<Genre> genres = new TreeSet<>();
+    private Set<Genre> genres = new TreeSet<>();
 }

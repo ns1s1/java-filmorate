@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
@@ -44,8 +45,7 @@ public class FilmService {
         validate(film);
 
         Long id = film.getId();
-        Film savedFilm = filmStorage.getFilmById(id)
-                .orElseThrow(() -> new NotFoundException("Фильм с id не найден"));
+        Film savedFilm = checkFilmIsExists(id);
 
         savedFilm.setName(film.getName());
         savedFilm.setDescription(film.getDescription());
@@ -63,13 +63,11 @@ public class FilmService {
     }
 
     public Film getById(Long filmId) {
-        return filmStorage.getFilmById(filmId)
-                .orElseThrow(() -> new NotFoundException("Фильм не найден"));
+        return checkFilmIsExists(filmId);
     }
 
     public void addLike(Long filmId, Long userId) {
-        Film film = filmStorage.getFilmById(filmId)
-                .orElseThrow(() -> new NotFoundException("Фильм не найден"));
+        Film film = checkFilmIsExists(filmId);
 
         if (userService.getById(userId) == null) {
             throw new NotFoundException("Пользователь не найден");
@@ -80,8 +78,7 @@ public class FilmService {
     }
 
     public void removeLike(Long filmId, Long userId) {
-        Film film = filmStorage.getFilmById(filmId)
-                .orElseThrow(() -> new NotFoundException("Фильм не найден"));
+        Film film = checkFilmIsExists(filmId);
 
         if (userService.getById(userId) == null) {
             throw new NotFoundException("Пользователь с не найден");
@@ -136,5 +133,11 @@ public class FilmService {
 
     private Long generateId() {
         return ++id;
+    }
+
+    private Film checkFilmIsExists(Long id) {
+        Film film = filmStorage.getFilmById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return film;
     }
 }

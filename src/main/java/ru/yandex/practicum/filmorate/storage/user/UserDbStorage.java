@@ -76,11 +76,6 @@ public class UserDbStorage implements UserStorage {
         toAddFriendships.forEach(f -> addFriendship(user, f));
     }
 
-    public void removeById(Long id) {
-        jdbcTemplate.update("delete from film_genre where film_id = ?", id);
-        jdbcTemplate.update("delete from film where film_id = ?", id);
-    }
-
     @Override
     public Optional<User> findById(long id) {
         return jdbcTemplate.query(

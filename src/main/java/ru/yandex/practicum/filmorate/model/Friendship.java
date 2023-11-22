@@ -10,8 +10,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class Friendship {
 
-    long friendId;
+    private long friendId;
 
     @EqualsAndHashCode.Exclude
-    boolean confirmed;
+    private boolean confirmed;
 }
