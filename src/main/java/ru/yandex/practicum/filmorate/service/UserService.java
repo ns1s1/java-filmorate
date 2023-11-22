@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import com.fasterxml.jackson.core.PrettyPrinter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
